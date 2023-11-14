@@ -53,7 +53,7 @@ namespace AsyncronousProgramming_MVC.Controllers
             //}
             //models.OrderByDescending(x => x.CreatedDate);
             #endregion
-            
+
             return View(categories);
         }
 
@@ -65,7 +65,7 @@ namespace AsyncronousProgramming_MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (await _categoryRepo.Any(x => x.Name == model.Name))
+                if (await _categoryRepo.Any(x => x.Name == model.Name && x.Status != Entities.Abstract.Status.Passive))
                 {
                     TempData["Warning"] = "Bu isim zaten kullanılmakta!";
                     return View(model);
@@ -89,6 +89,58 @@ namespace AsyncronousProgramming_MVC.Controllers
                 TempData["Error"] = "Aşağıdaki kurallara uyarak tekrar kayıt yapmayı deneyiniz!";
                 return View(model);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateCategory(int id)
+        {
+            if (id > 0)
+            {
+                var category = await _categoryRepo.GetById(id);
+                if (category != null)
+                {
+                    var model = _mapper.Map<UpdateCategoryDTO>(category);
+                    return View(model);
+                }
+            }
+            TempData["Error"] = "Kategori bulunamadı!";
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory(UpdateCategoryDTO model)
+        {
+            if (ModelState.IsValid) 
+            {
+                if (await _categoryRepo.Any(x => x.Name == model.Name && x.Status != Entities.Abstract.Status.Passive))
+                {
+                    TempData["Warning"] = "Bu isim zaten kayıtlıdır!";
+                    return View(model);
+                }
+                var category = _mapper.Map<Category>(model);
+                await _categoryRepo.Update(category);
+                TempData["Success"] = "Kategori güncellendi!";
+                return RedirectToAction("Index");
+            }
+            TempData["Error"] = "Lütfen aşağıdaki kurallara uyunuz!";
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            if (id > 0)
+            {
+                var category = await _categoryRepo.GetById(id);
+                if (category != null)
+                {
+                    await _categoryRepo.Delete(category);
+                    TempData["Success"] = "Kategori silindi!";
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData["Error"] = "Kategori bulunamadı!";
+            return RedirectToAction("Index");
         }
     }
 }

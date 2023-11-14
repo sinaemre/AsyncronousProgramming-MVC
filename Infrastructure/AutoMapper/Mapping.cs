@@ -9,6 +9,7 @@ namespace AsyncronousProgramming_MVC.Infrastructure.AutoMapper
         public Mapping()
         {
             CreateMap<Category, CreateCategoryDTO>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
         }
     }
 }

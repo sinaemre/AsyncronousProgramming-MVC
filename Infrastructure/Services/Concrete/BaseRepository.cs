@@ -63,7 +63,7 @@ namespace AsyncronousProgramming_MVC.Infrastructure.Services.Concrete
 
         public async Task<List<T>> GetByDefaults(Expression<Func<T, bool>> expression) => await _table.Where(expression).ToListAsync();
 
-        public async Task<T> GetById(int id) => await _table.FindAsync(id);
+        public async Task<T> GetById(int id) => await _table.FirstOrDefaultAsync(x => x.Id == id && x.Status != Status.Passive);
 
         public async Task<List<TResult>> GetFilteredList<TResult>(
                                                 Expression<Func<T, TResult>> select, 
