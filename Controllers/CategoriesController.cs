@@ -1,4 +1,6 @@
-﻿using AsyncronousProgramming_MVC.Infrastructure.Services.Interfaces;
+﻿using AsyncronousProgramming_MVC.Entities.Concrete;
+using AsyncronousProgramming_MVC.Infrastructure.Services.Interfaces;
+using AsyncronousProgramming_MVC.Models.DTO_s.CategoryDTO_s;
 using AsyncronousProgramming_MVC.Models.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +55,40 @@ namespace AsyncronousProgramming_MVC.Controllers
             #endregion
             
             return View(categories);
+        }
+
+        [HttpGet]
+        public IActionResult CreateCategory() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(CreateCategoryDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (await _categoryRepo.Any(x => x.Name == model.Name))
+                {
+                    TempData["Warning"] = "Bu isim zaten kullanılmakta!";
+                    return View(model);
+                }
+                else
+                {
+                    var category = _mapper.Map<Category>(model);
+
+                    //Yukarıda yaptığımız otomatik mapleme işleminin uzun hali aşağıdadır. 
+                    //var entity = new Category
+                    //{
+                    //    Name = model.Name
+                    //};
+                    await _categoryRepo.Add(category);
+                    TempData["Success"] = "Kategori eklendi!";
+                    return RedirectToAction("Index");
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Aşağıdaki kurallara uyarak tekrar kayıt yapmayı deneyiniz!";
+                return View(model);
+            }
         }
     }
 }
