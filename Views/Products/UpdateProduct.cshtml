@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "UpdateProduct";
+}
+@model UpdateProductDTO
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ürün Güncelle</h3>
+            </div>
+            <form asp-action="UpdateProduct" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Image" />
+                <div class="card-body">
+                    <div>
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Lütfen Ürün adı giriniz..." />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Description" class="form-label"></label>
+                        <input asp-for="Description" class="form-control" placeholder="Lütfen Ürün açıklaması giriniz..." />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="UnitPrice" class="form-label"></label>
+                        <input asp-for="UnitPrice" class="form-control" />
+                        <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="CategoryId" class="form-label">Kategori</label>
+                        <select asp-for="CategoryId" class="form-control">
+                            @foreach (var category in Model.Categories)
+                            {
+                                @if (Model.CategoryId == category.Id)
+                                {
+                                    <option value="@category.Id" selected="selected">@category.Name</option>
+                                }
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="UploadImage" class="form-label"></label>
+                        <input asp-for="UploadImage" class="form-control" />
+                        <span asp-validation-for="UploadImage" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="card-footer" style="height:50px;">
+                    <div>
+                        <button type="submit" class="btn btn-outline-success float-end">Kaydet</button>
+                        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-info float-start">Geri Dön</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

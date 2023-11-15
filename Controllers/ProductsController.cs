@@ -23,6 +23,8 @@ namespace AsyncronousProgramming_MVC.Controllers
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
         }
+
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var products = await _productRepo.GetFilteredList
@@ -87,6 +89,64 @@ namespace AsyncronousProgramming_MVC.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UpdateProduct(int id)
+        {
+            var product = await _productRepo.GetById(id);
+            if (product != null) 
+            {
+                var model = new UpdateProductDTO
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    Image = product.Image,
+                    Categories = await _categoryRepo.GetByDefaults(x => x.Status != Entities.Abstract.Status.Passive)
+                };
+
+                return View(model);
+            }
+            TempData["Error"] = "Böyle bir kategori bulunamadı!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProduct(UpdateProductDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                string imageName = model.Image;
+
+                if (model.UploadImage != null)
+                {
+                    string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+
+                    if (!string.Equals(model.Image, "noimage.png"))
+                    {
+                        string oldPath = Path.Combine(uploadDir, model.Image);
+                        if (System.IO.File.Exists(oldPath))
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+                    }
+
+                    imageName = $"{Guid.NewGuid()}_{model.UploadImage.FileName}";
+                    string filePath = Path.Combine(uploadDir, imageName);
+                    FileStream fileStream = new FileStream(filePath, FileMode.Create);
+                    await model.UploadImage.CopyToAsync(fileStream);
+                    fileStream.Close();
+                }
+
+                var product = _mapper.Map<Product>(model);
+                product.Image = imageName;
+                await _productRepo.Update(product);
+                TempData["Success"] = "Ürün güncellendi!";
+                return RedirectToAction("Index");
+            }
+            TempData["Error"] = "Lütfen aşağıdaki kurallara uyunuz!";
+            return View(model);
+        }
 
     }
 }
