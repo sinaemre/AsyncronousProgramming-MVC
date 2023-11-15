@@ -93,7 +93,7 @@ namespace AsyncronousProgramming_MVC.Controllers
         public async Task<IActionResult> UpdateProduct(int id)
         {
             var product = await _productRepo.GetById(id);
-            if (product != null) 
+            if (product != null)
             {
                 var model = new UpdateProductDTO
                 {
@@ -146,6 +146,23 @@ namespace AsyncronousProgramming_MVC.Controllers
             }
             TempData["Error"] = "Lütfen aşağıdaki kurallara uyunuz!";
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            if (id > 0)
+            {
+                var product = await _productRepo.GetById(id);
+                if (product != null)
+                {
+                    await _productRepo.Delete(product);
+                    TempData["Success"] = "Ürün silinmiştir!";
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData["Error"] = "Ürün bulunamadı!";
+            return RedirectToAction("Index");
         }
 
     }
