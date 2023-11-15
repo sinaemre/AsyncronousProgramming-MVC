@@ -15,7 +15,7 @@ namespace AsyncronousProgramming_MVC.Models.DTO_s.ProductDTO_s
         [Column(TypeName = "decimal(9,2)")] 
         public decimal UnitPrice { get; set; }
 
-        public string Image { get; set; }
+        public string? Image { get; set; }
         public IFormFile UploadImage { get; set; } //Resim yüklemek için kullanacağız
 
         [Required(ErrorMessage = "Kategori seçimi zorunludur!!")]

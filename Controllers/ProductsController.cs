@@ -59,6 +59,10 @@ namespace AsyncronousProgramming_MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct(CreateProductDTO model)
         {
+            ViewBag.Categories = new SelectList
+               (
+                   await _categoryRepo.GetByDefaults(x => x.Status != Entities.Abstract.Status.Passive), "Id", "Name"
+               );
             if (ModelState.IsValid)
             {
                 string imageName = "noimage.png";
